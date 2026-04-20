@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow Pro — Master Your Keystrokes</title>
+    <meta name="description" content="A premium typing practice platform with progressive levels, multiplayer races, coding mode, and performance tracking.">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- SCREEN: Landing / Home -->
+    <div id="screen-landing" class="screen active">
+        <div class="landing-wrap">
+            <div class="logo-hero">
+                <h1>Type<span class="accent">Flow</span> <span class="badge-pro">PRO</span></h1>
+                <p class="tagline">Master every keystroke. Dominate every race.</p>
+            </div>
+            <div class="landing-cards">
+                <div class="hero-card glass" id="card-solo">
+                    <div class="card-icon">⚡</div>
+                    <h3>Solo Practice</h3>
+                    <p>Progressive levels from A-Z to full sentences. Level up automatically as you improve.</p>
+                    <button class="btn btn-primary" id="btnGoSolo">Start Practice</button>
+                </div>
+                <div class="hero-card glass" id="card-multi">
+                    <div class="card-icon">🏆</div>
+                    <h3>Multiplayer Arena</h3>
+                    <p>Race against friends or random players online in real-time typing battles.</p>
+                    <button class="btn btn-accent" id="btnGoMulti">Join Arena</button>
+                </div>
+                <div class="hero-card glass" id="card-stats">
+                    <div class="card-icon">📊</div>
+                    <h3>My Dashboard</h3>
+                    <p>View your typing history, WPM trends, accuracy stats, and unlocked levels.</p>
+                    <button class="btn btn-ghost" id="btnGoDashboard">View Stats</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: Profile Setup -->
+    <div id="screen-profile" class="screen">
+        <div class="container-narrow glass">
+            <button class="btn-back" id="btnProfileBack">← Back</button>
+            <h2>Set Up Your Profile</h2>
+            <p class="sub">Tell us about you so we can personalize your practice.</p>
+
+            <div class="form-group">
+                <label>Your Username</label>
+                <input type="text" id="usernameInput" placeholder="e.g. SpeedTypist99" maxlength="20" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label>What do you want to practice?</label>
+                <div class="interest-selector" id="interestSelector">
+                    <button class="interest-btn active" data-interest="general" id="int-general">
+                        <span class="int-icon">📝</span>
+                        <span class="int-label">General</span>
+                        <span class="int-desc">Words & sentences</span>
+                    </button>
+                    <button class="interest-btn" data-interest="coding" id="int-coding">
+                        <span class="int-icon">💻</span>
+                        <span class="int-label">Coding</span>
+                        <span class="int-desc">Code snippets</span>
+                    </button>
+                    <button class="interest-btn" data-interest="custom" id="int-custom">
+                        <span class="int-icon">✏️</span>
+                        <span class="int-label">Custom</span>
+                        <span class="int-desc">Paste your text</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Coding sub-options -->
+            <div class="form-group hidden" id="codingOptions">
+                <label>Choose Programming Language</label>
+                <div class="lang-selector" id="langSelector">
+                    <button class="lang-btn active" data-lang="javascript">JS</button>
+                    <button class="lang-btn" data-lang="python">Python</button>
+                    <button class="lang-btn" data-lang="cpp">C++</button>
+                    <button class="lang-btn" data-lang="java">Java</button>
+                    <button class="lang-btn" data-lang="rust">Rust</button>
+                </div>
+            </div>
+
+            <!-- Custom text area -->
+            <div class="form-group hidden" id="customTextArea">
+                <label>Paste Your Custom Text</label>
+                <textarea id="customTextInput" placeholder="Paste the text you want to practice typing..." rows="5"></textarea>
+            </div>
+
+            <button class="btn btn-primary full-width" id="btnSaveProfile">Continue →</button>
+        </div>
+    </div>
+
+    <!-- SCREEN: Level Map -->
+    <div id="screen-levelmap" class="screen">
+        <div class="container glass">
+            <div class="screen-header">
+                <button class="btn-back" id="btnLevelBack">← Back</button>
+                <div class="user-badge" id="userBadge">
+                    <span class="user-avatar" id="userAvatarTop">A</span>
+                    <span id="userNameTop">Player</span>
+                </div>
+                <button class="btn btn-ghost small" id="btnOpenDash">📊 Stats</button>
+            </div>
+
+            <h2>Choose Your Level</h2>
+            <p class="sub">Complete levels to unlock the next. Auto-unlock when you hit 70% accuracy.</p>
+
+            <div class="level-map" id="levelMap">
+                <!-- Generated by JS -->
+            </div>
+
+            <div class="daily-quest glass-inner">
+                <div class="quest-info">
+                    <span class="quest-label">🎯 Daily Quest</span>
+                    <span class="quest-text" id="dailyQuestText">Reach 80 WPM</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="dailyProgress"></div>
+                    <span class="progress-label" id="dailyProgressLabel">0 / 80 WPM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: Practice / Game -->
+    <div id="screen-game" class="screen">
+        <div class="container glass">
+            <div class="game-header">
+                <button class="btn-back" id="btnGameBack">← Menu</button>
+                <div class="level-tag" id="levelTag">Level 1 — Letters</div>
+                <div class="header-stats">
+                    <div class="hstat"><span class="hstat-val" id="wpmValue">0</span><span class="hstat-label">WPM</span></div>
+                    <div class="hstat"><span class="hstat-val" id="accValue">100%</span><span class="hstat-label">ACC</span></div>
+                    <div class="hstat combo-stat"><span class="hstat-val" id="comboValue">×1</span><span class="hstat-label">COMBO</span></div>
+                    <div class="hstat timer-hstat"><span class="hstat-val" id="timeValue">30</span><span class="hstat-label">SEC</span></div>
+                </div>
+            </div>
+
+            <!-- Score line -->
+            <div class="score-line">
+                <span class="score-num" id="scoreValue">0</span>
+                <span class="score-label">pts</span>
+            </div>
+
+            <!-- Time progress bar -->
+            <div class="time-bar-wrap">
+                <div class="time-bar" id="timeBar"></div>
+            </div>
+
+            <!-- Multiplayer tracks (hidden in solo) -->
+            <div id="multiplayerTracks" class="mp-tracks hidden">
+                <div class="mp-tracks-title">🏁 Race Track</div>
+                <div id="tracksContainer"></div>
+            </div>
+
+            <!-- Typing Area -->
+            <div class="typing-zone" id="typingZone">
+                <div class="text-display" id="textDisplay"></div>
+                <input type="text" id="typingInput" class="ghost-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type here">
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-icon-round" id="btnRestart" title="Restart (Tab)">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 2.81-6.49L3 8"/></svg>
+                </button>
+                <button class="btn btn-ghost small hidden" id="btnLeaveArena">Leave Race</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: Results -->
+    <div id="screen-results" class="screen">
+        <div class="container-narrow glass">
+            <h2 id="resultsTitle">Session Complete!</h2>
+            <div id="levelUpBanner" class="level-up-banner hidden">
+                🎉 Level Up! You Unlocked <span id="newLevelName"></span>!
+            </div>
+
+            <div class="results-grid">
+                <div class="result-card primary">
+                    <div class="result-icon">⚡</div>
+                    <div class="result-val" id="finalWpm">0</div>
+                    <div class="result-label">WPM</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-icon">🎯</div>
+                    <div class="result-val" id="finalAcc">0%</div>
+                    <div class="result-label">Accuracy</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-icon">⭐</div>
+                    <div class="result-val" id="finalScore">0</div>
+                    <div class="result-label">Score</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-icon">🔥</div>
+                    <div class="result-val" id="finalCombo">×1</div>
+                    <div class="result-label">Best Combo</div>
+                </div>
+            </div>
+
+            <div id="arenaResult" class="arena-result hidden"></div>
+
+            <div class="results-actions">
+                <button class="btn btn-primary" id="btnPlayAgain">Play Again</button>
+                <button class="btn btn-ghost" id="btnBackHome">← Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: Multiplayer Lobby -->
+    <div id="screen-multiplayer" class="screen">
+        <div class="container-narrow glass">
+            <button class="btn-back" id="btnMultiBack">← Back</button>
+            <h2>Multiplayer Arena</h2>
+            <p class="sub">Race publicly or create a private room to challenge friends.</p>
+
+            <div class="mp-username-row">
+                <input type="text" id="mpUsernameInput" placeholder="Your username (required)" maxlength="20" autocomplete="off">
+            </div>
+
+            <div class="mp-options">
+                <div class="mp-option-card glass-inner" id="mpPublicCard">
+                    <div class="mp-opt-icon">🌐</div>
+                    <h3>Public Arena</h3>
+                    <p>Get matched with any online players instantly.</p>
+                    <button class="btn btn-primary" id="btnPublicArena">Join Public Race</button>
+                </div>
+                <div class="mp-option-card glass-inner" id="mpPrivateCard">
+                    <div class="mp-opt-icon">🔐</div>
+                    <h3>Private Room</h3>
+                    <p>Create a room or join a friend's room with a 6-digit code.</p>
+                    <div class="private-room-actions">
+                        <button class="btn btn-accent" id="btnCreateRoom">Create Room</button>
+                        <div class="or-divider">or</div>
+                        <div class="join-code-row">
+                            <input type="text" id="roomCodeInput" placeholder="Enter 6-digit code" maxlength="6" class="code-input" autocomplete="off">
+                            <button class="btn btn-ghost" id="btnJoinRoom">Join</button>
+                        </div>
+                    </div>
+                    <div class="room-code-display hidden" id="roomCodeDisplay">
+                        <span>Your Room Code:</span>
+                        <strong id="generatedRoomCode">------</strong>
+                        <button class="btn-copy" id="btnCopyCode" title="Copy">📋</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lobby-status" id="lobbyStatus">
+                <div class="player-list" id="playerList"></div>
+                <div class="status-msg" id="statusMsg"></div>
+            </div>
+
+            <p id="connectionStatus" class="conn-status"></p>
+        </div>
+    </div>
+
+    <!-- SCREEN: Performance Dashboard -->
+    <div id="screen-dashboard" class="screen">
+        <div class="container glass">
+            <button class="btn-back" id="btnDashBack">← Back</button>
+            <h2>My Performance</h2>
+
+            <div class="dash-summary">
+                <div class="dash-stat glass-inner">
+                    <div class="ds-val" id="dsBestWpm">0</div>
+                    <div class="ds-label">Best WPM</div>
+                </div>
+                <div class="dash-stat glass-inner">
+                    <div class="ds-val" id="dsAvgWpm">0</div>
+                    <div class="ds-label">Avg WPM</div>
+                </div>
+                <div class="dash-stat glass-inner">
+                    <div class="ds-val" id="dsAvgAcc">0%</div>
+                    <div class="ds-label">Avg Accuracy</div>
+                </div>
+                <div class="dash-stat glass-inner">
+                    <div class="ds-val" id="dsSessions">0</div>
+                    <div class="ds-label">Sessions</div>
+                </div>
+                <div class="dash-stat glass-inner">
+                    <div class="ds-val" id="dsStreak">0🔥</div>
+                    <div class="ds-label">Day Streak</div>
+                </div>
+            </div>
+
+            <div class="chart-section glass-inner">
+                <div class="chart-header">
+                    <h3>WPM History</h3>
+                    <div class="chart-legend">
+                        <span class="legend-dot primary"></span><span>WPM</span>
+                        <span class="legend-dot accent"></span><span>Accuracy</span>
+                    </div>
+                </div>
+                <canvas id="wpmChart" height="200"></canvas>
+                <div class="chart-empty hidden" id="chartEmpty">No sessions yet. Start practicing!</div>
+            </div>
+
+            <div class="levels-section">
+                <h3>Level Progress</h3>
+                <div class="level-badges" id="levelBadges"></div>
+            </div>
+
+            <div class="history-section">
+                <h3>Recent Sessions</h3>
+                <div class="history-list" id="historyList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Countdown overlay -->
+    <div id="countdownOverlay" class="countdown-overlay hidden">
+        <div class="countdown-num" id="countdownNum">3</div>
+    </div>
+
+    <!-- Confetti canvas -->
+    <canvas id="confettiCanvas" class="hidden"></canvas>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/performance.js"></script>
+    <script src="js/multiplayer.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
