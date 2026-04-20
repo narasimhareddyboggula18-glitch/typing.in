@@ -10,6 +10,10 @@ const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(express.static(path.join(__dirname, '')));
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // --- Server-side state ---
 let waitingPublicPlayers = []; // {id, name, socket}
 let activeArenas = {}; 
